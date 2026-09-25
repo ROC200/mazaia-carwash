@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>مغسلة مزايا الأولى</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9A%97%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#eef5f5; --surface:#ffffff; --line:#d9e5e5;
+  --text:#0d2b33; --muted:#5b7278;
+  --brand:#0f8b8d; --brand-deep:#0b5e60;
+  --gold:#f2b705; --gold-deep:#c98f02;
+  --danger:#c8412f;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0c2226; --surface:#123338; --line:#204349;
+    --text:#eaf4f4; --muted:#8ea9ac;
+    --brand:#22b3ac; --brand-deep:#1a8e88;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0c2226; --surface:#123338; --line:#204349;
+  --text:#eaf4f4; --muted:#8ea9ac; --brand:#22b3ac; --brand-deep:#1a8e88;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{height:100%}
+body{
+  margin:0; background:var(--paper); color:var(--text);
+  font-family:'Cairo','Tahoma',sans-serif;
+  display:flex; justify-content:center;
+}
+#app{width:100%; max-width:560px; min-height:100%; display:flex; flex-direction:column;}
+.topbar{
+  position:sticky; top:0; z-index:5;
+  padding:calc(env(safe-area-inset-top,0px) + 14px) 18px 14px;
+  background:var(--brand); color:#fff;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.topbar h2{margin:0; font-size:1.05rem; font-weight:800;}
+.topbar .badge{font-size:.78rem; opacity:.9;}
+.topbar button{
+  background:rgba(255,255,255,.18); color:#fff; border:none; border-radius:9px;
+  padding:8px 12px; font-size:.82rem; cursor:pointer; font-family:inherit;
+}
+.wrap{padding:18px 16px 40px; flex:1;}
+.card{
+  background:var(--surface); border:1px solid var(--line); border-radius:16px;
+  padding:20px; margin-bottom:16px;
+}
+.field-label{display:block; font-size:.85rem; color:var(--muted); margin:2px 0 8px; font-weight:600;}
+input[type=text],input[type=password],input[type=tel]{
+  width:100%; padding:14px; font-size:1.1rem; border-radius:12px;
+  border:1px solid var(--line); background:var(--paper); color:var(--text);
+  margin-bottom:16px; text-align:center; font-family:inherit;
+}
+.big-btn{
+  display:block; width:100%; padding:16px; border:none; border-radius:13px;
+  background:var(--brand); color:#fff; font-size:1.02rem; font-weight:700;
+  cursor:pointer; font-family:inherit;
+}
+.big-btn:active{background:var(--brand-deep)}
+.seg{display:flex; gap:8px; margin-bottom:16px;}
+.seg-btn{
+  flex:1; padding:12px 6px; border-radius:11px; border:1px solid var(--line);
+  background:var(--paper); color:var(--text); font-size:.92rem; cursor:pointer;
+  font-family:inherit; font-weight:600;
+}
+.seg-btn.active{background:var(--brand); border-color:var(--brand); color:#fff;}
+.center{text-align:center}
+.muted{color:var(--muted); font-size:.85rem;}
+.err{color:var(--danger); font-size:.9rem; margin-top:8px;}
+.plate-display{font-size:1.35rem; font-weight:800; text-align:center; margin-bottom:6px;}
+.dots{display:flex; gap:8px; justify-content:center; margin:14px 0;}
+.dot{width:26px; height:26px; border-radius:50%; background:var(--line); display:flex; align-items:center; justify-content:center; font-size:.78rem; color:var(--muted);}
+.dot.filled{background:var(--brand); color:#fff;}
+.free{
+  background:linear-gradient(135deg,var(--gold),var(--gold-deep)); color:#231a00;
+  padding:14px; border-radius:12px; text-align:center; font-weight:800; margin-top:12px;
+}
+.stats-grid{display:flex; gap:10px; margin-bottom:6px;}
+.stat-box{flex:1; background:var(--paper); border:1px solid var(--line); border-radius:12px; padding:12px 6px; text-align:center;}
+.stat-num{font-size:1.35rem; font-weight:800; color:var(--brand);}
+.stat-label{font-size:.76rem; color:var(--muted); margin-top:2px;}
+.section-title{font-size:.95rem; font-weight:800; margin:4px 0 12px;}
+.bar-row{display:flex; align-items:center; gap:8px; margin-bottom:9px;}
+.bar-label{width:64px; font-size:.82rem; color:var(--muted); flex-shrink:0;}
+.bar-track{flex:1; height:14px; background:var(--paper); border-radius:7px; overflow:hidden;}
+.bar-fill{height:100%; background:var(--brand); border-radius:7px;}
+.bar-fill.max{background:var(--gold-deep);}
+.bar-value{width:26px; text-align:left; font-size:.8rem; font-weight:700;}
+.login-wrap{flex:1; display:flex; align-items:center; justify-content:center; padding:20px;}
+.hint{font-size:.78rem; color:var(--muted); text-align:center; margin-top:4px;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, addDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+
+// ====== ضع إعدادات مشروعك من Firebase Project settings هنا ======
+const firebaseConfig = {
+  apiKey: "AIzaSyBJn9oVNiiXlQh2uF3vLHAaKqJj5ZT7P6A",
+  authDomain: "mazaiacarwash.firebaseapp.com",
+  projectId: "mazaiacarwash",
+  storageBucket: "mazaiacarwash.firebasestorage.app",
+  messagingSenderId: "402089110437",
+  appId: "1:402089110437:web:062b3aafd6aad5fde0d64c"
+};
+// ================================================================
+
+const BRANCH_COUNT = 12;
+const OWNER_PASSWORD = "21"; // مؤقت
+const AR_WEEKDAYS = ["الأحد","الإثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+
+const fbApp = initializeApp(firebaseConfig);
+const firestore = getFirestore(fbApp);
+const auth = getAuth(fbApp);
+let dbReady = false;
+
+async function initDb(){
+  try{
+    await signInAnonymously(auth);
+    await new Promise((resolve) => {
+      const unsub = onAuthStateChanged(auth, (user) => { if(user){ unsub(); resolve(); } });
+    });
+    dbReady = true;
+  }catch(e){ dbReady = false; }
+}
+
+function pad(n){ return n<10 ? "0"+n : ""+n; }
+function fmtDate(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+function monthKey(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1); }
+function startOfWeek(d){ const c=new Date(d.getFullYear(),d.getMonth(),d.getDate()); c.setDate(c.getDate()-c.getDay()); return c; }
+function fmtHour(h){ const period = h<12 ? "ص" : "م"; let hh = h%12; if(hh===0) hh=12; return hh+":00 "+period; }
+
+function el(html){ const t=document.createElement("template"); t.innerHTML=html.trim(); return t.content.firstElementChild; }
+
+// ---- جلسة الدخول ----
+function getSession(){ try{ return JSON.parse(sessionStorage.getItem("cw_session")); }catch(e){ return null; } }
+function setSession(s){ sessionStorage.setItem("cw_session", JSON.stringify(s)); }
+function clearSession(){ sessionStorage.removeItem("cw_session"); }
+function checkLogin(pw){
+  pw = (pw||"").trim();
+  if(pw === OWNER_PASSWORD) return { role:"owner" };
+  const n = parseInt(pw,10);
+  if(!isNaN(n) && n>=1 && n<=BRANCH_COUNT && String(n)===pw) return { role:"worker", branch:n };
+  return null;
+}
+
+function topbar(title, badge){
+  return `<div class="topbar"><div><h2>${title}</h2>${badge?`<div class="badge">${badge}</div>`:""}</div><button id="logoutBtn">خروج</button></div>`;
+}
+
+function render(){
+  const app = document.getElementById("app");
+  app.innerHTML = "";
+  const session = getSession();
+  if(!dbReady){
+    app.appendChild(el(`<div class="login-wrap"><div class="card center"><p class="err">تعذر الاتصال بقاعدة البيانات.<br>تأكد من ضبط إعدادات Firebase (firebaseConfig) وتفعيل تسجيل الدخول المجهول.</p></div></div>`));
+    return;
+  }
+  if(!session) app.appendChild(renderLogin());
+  else if(session.role==="owner") app.appendChild(renderOwner());
+  else app.appendChild(renderWorker(session.branch));
+}
+
+function bindLogout(wrap){
+  const btn = wrap.querySelector("#logoutBtn");
+  if(btn) btn.onclick = () => { clearSession(); render(); };
+}
+
+function renderLogin(){
+  const wrap = el(`<div class="login-wrap">
+    <div class="card" style="width:100%">
+      <h2 class="center" style="margin-top:0">🚗 مغسلة مزايا الأولى</h2>
+      <label class="field-label">كلمة المرور</label>
+      <input type="tel" inputmode="numeric" id="pw" placeholder="أدخل كلمة المرور">
+      <button class="big-btn" id="loginBtn">دخول</button>
+      <div id="loginErr"></div>
+    </div>
+  </div>`);
+  const doLogin = () => {
+    const pw = wrap.querySelector("#pw").value;
+    const s = checkLogin(pw);
+    const errBox = wrap.querySelector("#loginErr");
+    if(!s){ errBox.innerHTML = `<p class="err center">كلمة المرور غير صحيحة</p>`; return; }
+    setSession(s);
+    render();
+  };
+  wrap.querySelector("#loginBtn").onclick = doLogin;
+  wrap.querySelector("#pw").addEventListener("keydown", e => { if(e.key==="Enter") doLogin(); });
+  return wrap;
+}
+
+function renderWorker(branch){
+  const wrap = el(`<div>
+    ${topbar("تسجيل غسلة", "فرع رقم "+branch)}
+    <div class="wrap">
+      <div class="card">
+        <label class="field-label">رقم اللوحة</label>
+        <input type="text" id="plate" placeholder="أدخل رقم اللوحة" autocomplete="off">
+
+        <label class="field-label">حجم السيارة</label>
+        <div class="seg" id="sizeSeg">
+          <button class="seg-btn active" data-v="سيدان">سيدان</button>
+          <button class="seg-btn" data-v="وسط">وسط</button>
+          <button class="seg-btn" data-v="كبيرة">كبيرة</button>
+        </div>
+
+        <label class="field-label">نوع الغسلة</label>
+        <div class="seg" id="typeSeg">
+          <button class="seg-btn active" data-v="خارجي">خارجي</button>
+          <button class="seg-btn" data-v="داخلي">داخلي</button>
+        </div>
+
+        <button class="big-btn" id="submit">تسجيل الغسلة</button>
+        <div id="result"></div>
+      </div>
+    </div>
+  </div>`);
+  bindLogout(wrap);
+
+  function bindSeg(segId){
+    const seg = wrap.querySelector(segId);
+    seg.querySelectorAll(".seg-btn").forEach(b => {
+      b.onclick = () => { seg.querySelectorAll(".seg-btn").forEach(x=>x.classList.remove("active")); b.classList.add("active"); };
+    });
+    return () => seg.querySelector(".seg-btn.active").dataset.v;
+  }
+  const getSize = bindSeg("#sizeSeg");
+  const getType = bindSeg("#typeSeg");
+
+  const btn = wrap.querySelector("#submit");
+  btn.onclick = async () => {
+    const plateInput = wrap.querySelector("#plate");
+    const plate = plateInput.value.trim();
+    const resultBox = wrap.querySelector("#result");
+    if(!plate){ resultBox.innerHTML = `<p class="err">الرجاء إدخال رقم اللوحة</p>`; return; }
+    btn.disabled = true; btn.textContent = "جاري التسجيل...";
+    try{
+      const now = new Date();
+      const visitData = {
+        plate, branch, carSize:getSize(), washType:getType(),
+        dateKey: fmtDate(now), month: monthKey(now),
+        weekday: now.getDay(), hour: now.getHours(), ts: now.toISOString()
+      };
+      await addDoc(collection(firestore,"visits"), visitData);
+
+      const cardRef = doc(firestore,"cards",plate);
+      const snap = await getDoc(cardRef);
+      const prev = snap.exists() ? snap.data() : {};
+      let total = (prev.total||0)+1;
+      let sinceReward = (prev.sinceReward||0)+1;
+      let isFree = false;
+      if(sinceReward>=5){ isFree=true; sinceReward=0; }
+      await setDoc(cardRef, { plate, total, sinceReward, lastVisit: visitData.ts });
+
+      let dotsHtml = "";
+      const filled = isFree ? 5 : sinceReward;
+      for(let i=1;i<=5;i++) dotsHtml += `<div class="dot ${i<=filled?"filled":""}">${i}</div>`;
+
+      resultBox.innerHTML = `
+        <div class="plate-display">${plate}</div>
+        <p class="center muted">${visitData.carSize} · ${visitData.washType} — إجمالي زياراته: ${total}</p>
+        <div class="dots">${dotsHtml}</div>
+        ${isFree ? `<div class="free">🎉 مبروك! هذه الغسلة مجانية</div>` : `<p class="center muted">متبقي ${5 - sinceReward} غسلة/غسلات للحصول على غسلة مجانية</p>`}
+      `;
+      plateInput.value = "";
+    }catch(e){
+      resultBox.innerHTML = `<p class="err">حدث خطأ أثناء التسجيل: ${(e && e.code) || "غير معروف"}</p>`;
+    }
+    btn.disabled = false; btn.textContent = "تسجيل الغسلة";
+  };
+  return wrap;
+}
+
+function renderOwner(){
+  const wrap = el(`<div>
+    ${topbar("لوحة إحصائيات المالك")}
+    <div class="wrap">
+      <div class="card">
+        <label class="field-label">عرض إحصائيات</label>
+        <select id="branchFilter" style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--line); background:var(--paper); color:var(--text); font-family:inherit; font-size:1rem;">
+          <option value="all">كل الفروع</option>
+          ${Array.from({length:BRANCH_COUNT},(_,i)=>`<option value="${i+1}">فرع ${i+1}</option>`).join("")}
+        </select>
+      </div>
+      <div id="ownerBody"><p class="muted center">جاري التحميل...</p></div>
+    </div>
+  </div>`);
+  bindLogout(wrap);
+  loadOwnerStats(wrap);
+  return wrap;
+}
+
+async function loadOwnerStats(wrap){
+  const body = wrap.querySelector("#ownerBody");
+  try{
+    const now = new Date();
+    const todayKey = fmtDate(now);
+    const mKey = monthKey(now);
+    const sow = startOfWeek(now);
+    const weekKeys = [];
+    for(let i=0;i<7;i++){ const d=new Date(sow); d.setDate(sow.getDate()+i); weekKeys.push(fmtDate(d)); }
+    const weekStart = weekKeys[0], weekEnd = weekKeys[6];
+
+    const visitsCol = collection(firestore,"visits");
+    const [todaySnap, weekSnap, monthSnap, cardsSnap] = await Promise.all([
+      getDocs(query(visitsCol, where("dateKey","==",todayKey))),
+      getDocs(query(visitsCol, where("dateKey",">=",weekStart), where("dateKey","<=",weekEnd))),
+      getDocs(query(visitsCol, where("month","==",mKey))),
+      getDocs(collection(firestore,"cards"))
+    ]);
+
+    // نخزن كل البيانات (كل الفروع) مرة وحدة، ونفلترها محليًا كل ما تغيّر اختيار الفرع — بدون أي طلب إضافي لقاعدة البيانات
+    const rawData = {
+      today: todaySnap.docs.map(d=>d.data()),
+      week: weekSnap.docs.map(d=>d.data()),
+      month: monthSnap.docs.map(d=>d.data()),
+      totalCarsAll: cardsSnap.size
+    };
+
+    renderOwnerBody(body, rawData, "all");
+    wrap.querySelector("#branchFilter").onchange = (e) => renderOwnerBody(body, rawData, e.target.value);
+  }catch(e){
+    body.innerHTML = `<p class="err">تعذر تحميل الإحصائيات: ${(e && e.code) || "غير معروف"}</p>`;
+  }
+}
+
+function renderOwnerBody(body, rawData, branchFilter){
+  const match = branchFilter==="all" ? (()=>true) : (v => String(v.branch)===String(branchFilter));
+  const todayCount = rawData.today.filter(match).length;
+  const weekTotal = rawData.week.filter(match).length;
+  const monthDocs = rawData.month.filter(match);
+  const monthTotal = monthDocs.length;
+
+  const weekdayCounts = [0,0,0,0,0,0,0];
+  const hourCounts = new Array(24).fill(0);
+  const plateSet = new Set();
+  monthDocs.forEach(v => {
+    if(typeof v.weekday === "number") weekdayCounts[v.weekday]++;
+    if(typeof v.hour === "number") hourCounts[v.hour]++;
+    if(v.plate) plateSet.add(v.plate);
+  });
+  const maxWeekday = Math.max(1, ...weekdayCounts);
+
+  let weekdayRows = "";
+  weekdayCounts.forEach((c,i) => {
+    const pct = Math.round((c/maxWeekday)*100);
+    weekdayRows += `<div class="bar-row"><span class="bar-label">${AR_WEEKDAYS[i]}</span><div class="bar-track"><div class="bar-fill ${c===maxWeekday && c>0 ? "max":""}" style="width:${pct}%"></div></div><span class="bar-value">${c}</span></div>`;
+  });
+
+  const topHours = hourCounts
+    .map((c,h) => ({h,c}))
+    .filter(x => x.c>0)
+    .sort((a,b) => b.c-a.c)
+    .slice(0,5);
+  const maxHour = topHours.length ? topHours[0].c : 1;
+  let hourRows = topHours.length ? "" : `<p class="muted center">لا توجد بيانات كافية بعد هذا الشهر</p>`;
+  topHours.forEach((x,i) => {
+    const pct = Math.round((x.c/maxHour)*100);
+    hourRows += `<div class="bar-row"><span class="bar-label">${fmtHour(x.h)}</span><div class="bar-track"><div class="bar-fill ${i===0?"max":""}" style="width:${pct}%"></div></div><span class="bar-value">${x.c}</span></div>`;
+  });
+
+  const carsLine = branchFilter==="all"
+    ? `عدد السيارات المسجلة في نظام الولاء (كل الفروع): ${rawData.totalCarsAll}`
+    : `عدد السيارات المختلفة اللي زارت هذا الفرع هذا الشهر: ${plateSet.size}`;
+  const scopeLabel = branchFilter==="all" ? "كل الفروع" : ("فرع "+branchFilter);
+
+  body.innerHTML = `
+      <div class="card">
+        <div class="stats-grid">
+          <div class="stat-box"><div class="stat-num">${todayCount}</div><div class="stat-label">اليوم</div></div>
+          <div class="stat-box"><div class="stat-num">${weekTotal}</div><div class="stat-label">هذا الأسبوع</div></div>
+          <div class="stat-box"><div class="stat-num">${monthTotal}</div><div class="stat-label">هذا الشهر</div></div>
+        </div>
+        <p class="muted center" style="margin:8px 0 0">${carsLine}</p>
+      </div>
+      <div class="card">
+        <p class="section-title">الأيام الأكثر ازدحامًا (هذا الشهر — ${scopeLabel})</p>
+        ${weekdayRows}
+      </div>
+      <div class="card">
+        <p class="section-title">أكثر 5 ساعات ازدحامًا (هذا الشهر — ${scopeLabel})</p>
+        ${hourRows}
+      </div>
+    `;
+}
+
+(async function(){
+  await initDb();
+  render();
+})();
+</script>
+</body>
+</html>

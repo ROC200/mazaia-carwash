@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>نظام مغاسل السيارات</title>
+<title>مغسلة مزايا الأولى</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9A%97%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -184,7 +184,7 @@ function bindLogout(wrap){
 function renderLogin(){
   const wrap = el(`<div class="login-wrap">
     <div class="card" style="width:100%">
-      <h2 class="center" style="margin-top:0">🚗 نظام مغاسل السيارات</h2>
+      <h2 class="center" style="margin-top:0">🚗 مغسلة مزايا الأولى</h2>
       <label class="field-label">كلمة المرور</label>
       <input type="tel" inputmode="numeric" id="pw" placeholder="أدخل كلمة المرور">
       <button class="big-btn" id="loginBtn">دخول</button>
@@ -289,7 +289,16 @@ function renderWorker(branch){
 function renderOwner(){
   const wrap = el(`<div>
     ${topbar("لوحة إحصائيات المالك")}
-    <div class="wrap" id="ownerBody"><p class="muted center">جاري التحميل...</p></div>
+    <div class="wrap">
+      <div class="card">
+        <label class="field-label">عرض إحصائيات</label>
+        <select id="branchFilter" style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--line); background:var(--paper); color:var(--text); font-family:inherit; font-size:1rem;">
+          <option value="all">كل الفروع</option>
+          ${Array.from({length:BRANCH_COUNT},(_,i)=>`<option value="${i+1}">فرع ${i+1}</option>`).join("")}
+        </select>
+      </div>
+      <div id="ownerBody"><p class="muted center">جاري التحميل...</p></div>
+    </div>
   </div>`);
   bindLogout(wrap);
   loadOwnerStats(wrap);
@@ -315,59 +324,79 @@ async function loadOwnerStats(wrap){
       getDocs(collection(firestore,"cards"))
     ]);
 
-    const todayCount = todaySnap.size;
-    const weekTotal = weekSnap.size;
-    const monthTotal = monthSnap.size;
-    const totalCars = cardsSnap.size;
+    // نخزن كل البيانات (كل الفروع) مرة وحدة، ونفلترها محليًا كل ما تغيّر اختيار الفرع — بدون أي طلب إضافي لقاعدة البيانات
+    const rawData = {
+      today: todaySnap.docs.map(d=>d.data()),
+      week: weekSnap.docs.map(d=>d.data()),
+      month: monthSnap.docs.map(d=>d.data()),
+      totalCarsAll: cardsSnap.size
+    };
 
-    const weekdayCounts = [0,0,0,0,0,0,0];
-    const hourCounts = new Array(24).fill(0);
-    monthSnap.docs.forEach(d => {
-      const v = d.data();
-      if(typeof v.weekday === "number") weekdayCounts[v.weekday]++;
-      if(typeof v.hour === "number") hourCounts[v.hour]++;
-    });
-    const maxWeekday = Math.max(1, ...weekdayCounts);
+    renderOwnerBody(body, rawData, "all");
+    wrap.querySelector("#branchFilter").onchange = (e) => renderOwnerBody(body, rawData, e.target.value);
+  }catch(e){
+    body.innerHTML = `<p class="err">تعذر تحميل الإحصائيات: ${(e && e.code) || "غير معروف"}</p>`;
+  }
+}
 
-    let weekdayRows = "";
-    weekdayCounts.forEach((c,i) => {
-      const pct = Math.round((c/maxWeekday)*100);
-      weekdayRows += `<div class="bar-row"><span class="bar-label">${AR_WEEKDAYS[i]}</span><div class="bar-track"><div class="bar-fill ${c===maxWeekday && c>0 ? "max":""}" style="width:${pct}%"></div></div><span class="bar-value">${c}</span></div>`;
-    });
+function renderOwnerBody(body, rawData, branchFilter){
+  const match = branchFilter==="all" ? (()=>true) : (v => String(v.branch)===String(branchFilter));
+  const todayCount = rawData.today.filter(match).length;
+  const weekTotal = rawData.week.filter(match).length;
+  const monthDocs = rawData.month.filter(match);
+  const monthTotal = monthDocs.length;
 
-    const topHours = hourCounts
-      .map((c,h) => ({h,c}))
-      .filter(x => x.c>0)
-      .sort((a,b) => b.c-a.c)
-      .slice(0,5);
-    const maxHour = topHours.length ? topHours[0].c : 1;
-    let hourRows = topHours.length ? "" : `<p class="muted center">لا توجد بيانات كافية بعد هذا الشهر</p>`;
-    topHours.forEach((x,i) => {
-      const pct = Math.round((x.c/maxHour)*100);
-      hourRows += `<div class="bar-row"><span class="bar-label">${fmtHour(x.h)}</span><div class="bar-track"><div class="bar-fill ${i===0?"max":""}" style="width:${pct}%"></div></div><span class="bar-value">${x.c}</span></div>`;
-    });
+  const weekdayCounts = [0,0,0,0,0,0,0];
+  const hourCounts = new Array(24).fill(0);
+  const plateSet = new Set();
+  monthDocs.forEach(v => {
+    if(typeof v.weekday === "number") weekdayCounts[v.weekday]++;
+    if(typeof v.hour === "number") hourCounts[v.hour]++;
+    if(v.plate) plateSet.add(v.plate);
+  });
+  const maxWeekday = Math.max(1, ...weekdayCounts);
 
-    body.innerHTML = `
+  let weekdayRows = "";
+  weekdayCounts.forEach((c,i) => {
+    const pct = Math.round((c/maxWeekday)*100);
+    weekdayRows += `<div class="bar-row"><span class="bar-label">${AR_WEEKDAYS[i]}</span><div class="bar-track"><div class="bar-fill ${c===maxWeekday && c>0 ? "max":""}" style="width:${pct}%"></div></div><span class="bar-value">${c}</span></div>`;
+  });
+
+  const topHours = hourCounts
+    .map((c,h) => ({h,c}))
+    .filter(x => x.c>0)
+    .sort((a,b) => b.c-a.c)
+    .slice(0,5);
+  const maxHour = topHours.length ? topHours[0].c : 1;
+  let hourRows = topHours.length ? "" : `<p class="muted center">لا توجد بيانات كافية بعد هذا الشهر</p>`;
+  topHours.forEach((x,i) => {
+    const pct = Math.round((x.c/maxHour)*100);
+    hourRows += `<div class="bar-row"><span class="bar-label">${fmtHour(x.h)}</span><div class="bar-track"><div class="bar-fill ${i===0?"max":""}" style="width:${pct}%"></div></div><span class="bar-value">${x.c}</span></div>`;
+  });
+
+  const carsLine = branchFilter==="all"
+    ? `عدد السيارات المسجلة في نظام الولاء (كل الفروع): ${rawData.totalCarsAll}`
+    : `عدد السيارات المختلفة اللي زارت هذا الفرع هذا الشهر: ${plateSet.size}`;
+  const scopeLabel = branchFilter==="all" ? "كل الفروع" : ("فرع "+branchFilter);
+
+  body.innerHTML = `
       <div class="card">
         <div class="stats-grid">
           <div class="stat-box"><div class="stat-num">${todayCount}</div><div class="stat-label">اليوم</div></div>
           <div class="stat-box"><div class="stat-num">${weekTotal}</div><div class="stat-label">هذا الأسبوع</div></div>
           <div class="stat-box"><div class="stat-num">${monthTotal}</div><div class="stat-label">هذا الشهر</div></div>
         </div>
-        <p class="muted center" style="margin:8px 0 0">عدد السيارات المسجلة في نظام الولاء: ${totalCars}</p>
+        <p class="muted center" style="margin:8px 0 0">${carsLine}</p>
       </div>
       <div class="card">
-        <p class="section-title">الأيام الأكثر ازدحامًا (هذا الشهر — كل الفروع)</p>
+        <p class="section-title">الأيام الأكثر ازدحامًا (هذا الشهر — ${scopeLabel})</p>
         ${weekdayRows}
       </div>
       <div class="card">
-        <p class="section-title">أكثر 5 ساعات ازدحامًا (هذا الشهر — كل الفروع)</p>
+        <p class="section-title">أكثر 5 ساعات ازدحامًا (هذا الشهر — ${scopeLabel})</p>
         ${hourRows}
       </div>
     `;
-  }catch(e){
-    body.innerHTML = `<p class="err">تعذر تحميل الإحصائيات: ${(e && e.code) || "غير معروف"}</p>`;
-  }
 }
 
 (async function(){
